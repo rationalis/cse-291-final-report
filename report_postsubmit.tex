@@ -577,26 +577,29 @@ comparisons, and the tree has $L = O(\log n)$ levels, so there are $O(\log^2 n)$
 comparisons, which dominates the $O(\log n)$ edge traversals. Batch queries of
 $v$ points will take at most $O(v \log^2 n)$ operations.
 
-We can show this is also a lower bound using the arithmetic-geometric mean
-(AM-GM) inequality. Let $D_1,D_2,...,D_k$ be the degrees of each branching node
-on the worst-case path to a leaf, where by construction, $k \leq L$. Then the
-required number of comparisons is $\sum_{i=1}^k \log_2 D_i = \log_2(\Pi_{i=1}^k
-D_i)$. We can lower bound this using the AM-GM inequality:
+We can show a tighter bound using the arithmetic-geometric mean (AM-GM)
+inequality. Let $D_1,D_2,...,D_k$ be the degrees of each branching node on the
+worst-case path to a leaf, where by construction, $k \leq L$. Then the required
+number of comparisons is $\sum_{i=1}^k \log_2 D_i = \log_2(\Pi_{i=1}^k D_i)$. We can
+upper bound this using the AM-GM inequality:
 
 \begin{align}
-  \frac{1}{k} \sum_{i=1}^k D_i &\leq \sqrt[k]{\Pi_{i=1}^k D_i} \\
-  \log (\frac{1}{k} \sum_{i=1}^k D_i) &\leq \frac{1}{k} \log (\Pi_{i=1}^k D_i) \\
-  k \log (\frac{1}{k} \sum_{i=1}^k D_i) &\leq \sum_{i=k}^k \log D_i
+  \frac{1}{k} \sum_{i=1}^k D_i &\geq \sqrt[k]{\Pi_{i=1}^k D_i} \\
+  \log (\frac{1}{k} \sum_{i=1}^k D_i) &\geq \frac{1}{k} \log (\Pi_{i=1}^k D_i) \\
+  k \log (\frac{1}{k} \sum_{i=1}^k D_i) &\geq \sum_{i=k}^k \log D_i
 \end{align}
 
-Note that $\sum D_i \leq n + L$, since there are at most $L$ branching nodes in the
-path, and every child at each branch which is not on the path will lead to at
-least one distinct leaf. The bound $n + L$ is achieved when there are $L$
-branching nodes, and each leaf (other than the one at the end of the path)
-corresponds to exactly one child of a branching node. The maximal value for $k$
-is $L$. So the LHS is lower bounded, in the worst case, by $\log^2 n - \log n
-\log \log n$. Thus the bound is sharp, and in the worst case, there are
-$\Theta(\log^2 n)$ operations.
+Equality is achievable precisely when all $D_i$ are equal, so let $D_1 = D_2 =
+... = D_k = D$. In particular, the LHS simplifies to $k \log D$.
+
+Note that $\sum D_i \leq n + k$, since there are $k$ branching nodes in the path, and
+every child at each branch which is not on the path will lead to at least one
+distinct leaf. This upper bound is achieved when each leaf (other than the one
+at the end of the path) corresponds to a unique child of a branching node.
+
+Thus we obtain $D \leq \frac{n + k}{k}$, and therefore the LHS of inequality (3) is
+maximally $L \log (\frac{n+L}{L})$. Asymptotically, $L = \Theta(\log n)$ in the worst
+case, so the worst-case decompression time is $\Theta(\log n \log \frac{n}{\log n})$.
 
 However, in most cases, we will find that decompression of a single point
 actually takes $O(\log n)$ operations. Consider datasets which are
@@ -605,15 +608,16 @@ constant independent of $n$. In this case, binary search across the children of
 each node is $O(1)$, giving an overall decompression time of $O(\log n)$.
 
 Then consider the opposite, datasets which are well-separated in the sense that
-the degree of branching nodes above a small constant is $\Omega(n)$. In this case,
-while the overall height of the tree may still be $O(\Lambda)$, the number of
-branching nodes which is encountered on any path to a leaf must be $O(1)$. Thus
-there are $O(\log n)$ comparisons required, so decompression takes $O(\log n)$
-operations under our assumptions.
+branching nodes have degree $\Omega(n)$. In this case, the number of branching nodes
+which is encountered on any path to a leaf must be $O(1)$. Thus there are
+$O(\log n)$ comparisons required, so decompression takes $O(\log n)$ operations
+under our assumptions.
 
 Thus in both cases of well-clustered and well-separated data, we obtain $O(\log
 n)$ operations per point for decompression, which is significantly better than
-the $O(\log^2 n)$ operations of the pathological worst case.
+the $O(\log^2 n)$ operations of the pathological worst case. We can also see
+that this applies, via recursion on subtrees, to any tree where every branching
+node is either well-clustered or well-separated.
 
 \subsection{Conclusion}
 
